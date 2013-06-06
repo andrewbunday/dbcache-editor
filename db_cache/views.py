@@ -6,6 +6,7 @@ import time
 from functools import wraps
 from collections import defaultdict
 import shutil
+import glob
 
 # Application framework imports
 from flask import render_template
@@ -28,8 +29,6 @@ def index():
     potential_show_folders = os.listdir('/mnt/shows')
     actual_show_folders = []
 
-    print potential_show_folders
-
     for f_ in potential_show_folders:
         if os.path.exists('/mnt/shows/{0}/tank/cache/path_cache.db'.format(f_)):
             print "%s cache db found" % f_
@@ -46,7 +45,6 @@ def editor(showname):
         # been loaded.
         db.cur.execute('SELECT * FROM path_cache ORDER BY entity_type, entity_name')
         data = db.cur.fetchall()
-        #js_data = json.dumps(data)
 
         return render_template('editor.html', fields=data, showname=showname)
 
@@ -54,25 +52,27 @@ def editor(showname):
 def save_cache(showname):
     """save callback"""
 
-    # form_data = {}
-    # for row in request.form:
-    #     id_, key = re.findall('(\d+)\[([a-z]+)\]', row)[0]
-    #     value = request.form.getlist(row)[0]
-    #     if id_ not in form_data:
-    #         form_data[id_] = {}
-    #     form_data[id_][key] = value
+    cache_files = glob.glob('/mnt/shows/{0}/tank/cache/path_cache*'.format(showname))
+    cache_files.sort()
 
-    # @TODO backup original path_cache.db
-    # shutil.copy('/mnt/shows/{0}/tank/cache/path_cache.db'.format(showname),
-    #            '/mnt/shows/{0}/tank/cache/path_cache.db.1'.format(showname))
+    if len(cache_files[-1].split('.')) > 2:
+        # increment last
+        prefix, suffix, incr = cache_files[-1].split('.')
+        incr = int(incr) + 1
+        backup_cache = ".".join([prefix, suffix, str(incr)])
+    else:
+        backup_cache = '/mnt/shows/{0}/tank/cache/path_cache.db.1'.format(showname)
 
-    with Connector('/mnt/shows/{0}/tank/cache/path_cache.db.1'.format(showname)) as db:
+    shutil.copy('/mnt/shows/{0}/tank/cache/path_cache.db'.format(showname), backup_cache)
+
+    with Connector('/mnt/shows/{0}/tank/cache/path_cache.db'.format(showname)) as db:
         # this way the connection is automatically destroyed then the page has
         # been loaded.
 
         # get some info about our table
         db.cur.execute("PRAGMA table_info(path_cache)")
         table_info = db.cur.fetchall()
+        print table_info
 
         # old with the old
         db.cur.execute("DELETE FROM path_cache")
@@ -84,13 +84,14 @@ def save_cache(showname):
 
             # munge the insert query to match the schema of the table
             if len(table_info) == 6:
-                query = "INSERT INTO path_cache VALUES({id}, '{type}', '{name}', 'primary', '{path}', 1)".format(**row_data)
+                query = "INSERT INTO path_cache VALUES('{type}', {id}, '{name}', 'primary', '{path}', 1)".format(**row_data)
             else:
-                query = "INSERT INTO path_cache VALUES({id}, '{type}', '{name}', 'primary', '{path}')".format(**row_data)
+                query = "INSERT INTO path_cache VALUES('{type}', {id}, '{name}', 'primary', '{path}')".format(**row_data)
 
             try:
                 db.cur.execute(query)
-            except sqlite3.OperationalError:
+            except sqlite3.OperationalError as e:
+                print e
                 print "insert into database failed: ",
             finally:
                 print query
