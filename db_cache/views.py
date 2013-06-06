@@ -64,6 +64,7 @@ def save_cache(showname):
         backup_cache = '/mnt/shows/{0}/tank/cache/path_cache.db.1'.format(showname)
 
     shutil.copy('/mnt/shows/{0}/tank/cache/path_cache.db'.format(showname), backup_cache)
+    os.chown(backup_cache, 1900, 20)
 
     with Connector('/mnt/shows/{0}/tank/cache/path_cache.db'.format(showname)) as db:
         # this way the connection is automatically destroyed then the page has
