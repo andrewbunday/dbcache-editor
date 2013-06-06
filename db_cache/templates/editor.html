@@ -33,7 +33,8 @@
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(payload),
-                success: function() { alert('Cache Saved: OK'); }
+                success: function() { alert('Cache Saved: OK'); },
+                error: function() { alert('Error Occured'); }
             });
 
         }

@@ -100,6 +100,6 @@ def save_cache(showname):
                 db.con.commit()
             except sqlite3.OperationalError:
                 print "unable to commit changes to database"
-                return
+                return "fail"
 
     return "success"
