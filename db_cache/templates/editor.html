@@ -30,7 +30,7 @@
             $.ajax({
                 url: 'http://dbcache/save/{{showname}}',
                 type: 'POST',
-                dataType: 'json',
+                //dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 data: JSON.stringify(payload),
                 success: function() { alert('Cache Saved: OK'); },
