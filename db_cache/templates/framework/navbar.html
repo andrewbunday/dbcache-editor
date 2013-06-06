@@ -1,0 +1,27 @@
+{% block navbar %}
+<div class="navbar navbar-fixed-top navbar-inverse">
+  <div class="navbar-inner">
+    <a class="brand" href="/">{{config.APP_NAME}}</a>
+    <ul class="nav pull-left">
+      <li class="divider-vertical"></li>
+      <li><a href="{{ url_for('get_repository_detail') }}">Browse</a></li>
+      <li><a href="{{ url_for('get_packages') }}">Search</a></li>
+    </ul>
+
+    <ul class="nav pull-right">
+      <li><a href="{{ url_for('get_help') }}">Help</a></li>
+      <li class="divider-vertical"></li>
+      <li class="dropdown">
+        <a id="drop1" role="button" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="icon-cog icon-white"></i> <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+            <li><a tabindex="-1", href="{{ url_for('get_settings') }}">Settings</a></li>
+            <li><a tabindex="-1", href="{{ url_for('precache_package_detail') }}">Reload Cache</a></li>
+            <li><a tabindex="-1", href="{{ url_for('get_about') }}">About</a></li>
+        </ul>
+    </ul>
+  </div>
+</div>
+{% include "framework/breadcrumb.html" %}
+{% endblock %}

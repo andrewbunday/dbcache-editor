@@ -1,0 +1,99 @@
+{% extends "framework/layout.html" %}
+{% block title %}{{config.APP_NAME}}{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <script>
+
+        function saveCache()
+        {
+            // attempt to read the content of the table_fields table and
+            // serialize it and save it by calling save view
+
+            var payload = {};
+            var i = 0;
+
+            $('#tableFieldsBody > tr').each(function() {
+              var columns = $(this)[0].getElementsByTagName("td");
+
+              var row_id   = columns[0].innerHTML;
+              var row_type = columns[1].innerHTML;
+              var row_name = columns[2].innerHTML;
+              var row_path = columns[3].innerHTML;
+
+              payload[i] = {'id': row_id, 'type': row_type, 'name': row_name, 'path': row_path};
+              i++;
+
+            });
+
+            $.ajax({
+                url: 'http://localhost:5000/save/{{showname}}',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(payload),
+                success: function() { alert('Cache Saved: OK'); }
+            });
+
+        }
+
+        function deleteRow(rowToDelete)
+        {
+            // $(this) will be the button clicked
+            var selector = '#' + rowToDelete + ".rowElement"
+            var tr = $(selector)
+            console.log(tr);
+            tr.remove();
+        }
+
+    </script>
+
+    <div class="row-fluid">
+        <div class="span10 offset1">
+            <div class="hero-unit">
+                <h1>DBCache Editor <small>an online editor for the local tank cache</small></h1>
+                <h3>Edit fields you need to update and hit the 'save' button to write back into the cache</h3>
+
+                <div class="row-fluid">
+                    <div class="span5 offset1">
+                        <button class="btn btn-block btn-warning" onclick="window.location.href='/'">Back</button>
+                    </div>
+                    <div class="span5">
+                        <button class="btn btn-block btn-primary" onclick="saveCache()">Save</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row-fluid">
+        <div class="span10 offset1">
+            <h2 id="data-fields">Data Fields</h2>
+
+                <table class="table" id="table_fields">
+                    <thead>
+                        <th>ID <i class="icon-tags"></i></th>
+                        <th>Type <i class="icon-folder-open"></i></th>
+                        <th>Shot/Asset Name <i class="icon-book"></i></th>
+                        <th>Path <i class="icon-th-list"></i></th>
+                    </thead>
+                    <tbody id='tableFieldsBody'>
+                    {% for item in fields %}
+                    {% if item %}
+                        <tr class='rowElement' id="{{item[1]}}">
+                            <td id='id'>{{ item[1] }}</td>
+                            <td id='type'>{{ item[0] }}</td>
+                            <td id='name' contenteditable>{{ item[2] }}</td>
+                            <td id='path' contenteditable>{{ item[4] }}</td>
+                            <td id='delete'><button class="btn btn-danger btn-mini" onclick="deleteRow('{{item[1]}}')">Delete</button></td>
+                        </tr>
+                    {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,29 @@
+{% extends "framework/layout.html" %}
+{% block title %}{{config.APP_NAME}}{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <script>
+        $('#reprepro').tooltip({})
+    </script>
+
+    <div class="row-fluid">
+        <div class="span10 offset1">
+            <div class="hero-unit">
+                <h1>DBCache Editor <small>an online editor for the local tank cache</h1>
+                <h3>Select a show from the list below to load the cache and start editing</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row-fluid">
+        <div class="span10 offset1">
+            <h2 id="show-list">Shows on disk</h2>
+                {% for show_ in shows %}
+                     <button class="btn" onclick="window.location.href='/editor/{{show_}}'">{{ show_ }}</button>
+                {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+

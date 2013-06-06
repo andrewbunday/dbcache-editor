@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=runserver.py
+PROGHOME=/opt/dbcache_editor
+NAME=dbcache-editor
+DESC=Web service providing a frontend for editing tank path_cache.db files
+
+test -x $PROGHOME/$DAEMON || exit 1
+
+LOGFILE=/var/log/$NAME.log
+PIDFILE=/var/run/$NAME.pid
+
+case "$1" in
+  start)
+    echo "[`date`] Starting: $DESC" >> $LOGFILE 2>&1
+    start-stop-daemon --group dialout --background --start --make-pidfile --pidfile $PIDFILE --chdir $PROGHOME --exec $PROGHOME/$DAEMON -- 80 >> $LOGFILE 2>&1
+    ;;
+  stop)
+    echo "[`date`] Stopping: $DESC" >> $LOGFILE 2>&1
+    start-stop-daemon --stop --retry=TERM/30/KILL/5 --pidfile $PIDFILE
+    ;;
+  *)
+    echo "Usage: $0 {start|stop)" >&2
+    exit 1
+    ;;
+esac
+
+exit 0
