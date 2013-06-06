@@ -11,6 +11,11 @@
             // attempt to read the content of the table_fields table and
             // serialize it and save it by calling save view
 
+            var r=confirm("Are you sure?");
+            if (r==false) {
+                return;
+            }
+
             var payload = {};
             var i = 0;
 
